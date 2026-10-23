@@ -27,7 +27,7 @@ dsDarwin/
 │   └── k8s/               # Kubernetes manifests
 ├── examples/              # (planned) runnable analyses, e.g. HERON on Delphi-100k
 ├── docs/                  # (planned) wrapping guide, CONTRIBUTING.md
-├── spec/                  # (planned) ADRs, constraints, iteration plans
+├── spec/                  # ADRs, constraints, iteration plans
 └── .github/workflows/     # (planned) CI: R CMD check, Rock image build and push
 ```
 
@@ -47,7 +47,7 @@ Each `Client/` and `Server/` folder is a standalone R package. Build, check and 
 
 ## Rules
 
-1. **Spec first.** Read `spec/` before changing behaviour. Record any new decision as an ADR in `spec/adr/` before you implement it.
+1. **Spec first.** Read `spec/` before changing behaviour. Record any new decision as an ADR in `spec/adr/` (copy `template.md`) before you implement it.
 2. **Disclosure control.** Server functions must never return row-level data to the client. Every aggregate function checks its output against the DataSHIELD disclosure thresholds (`nfilter.*`) before returning it.
 3. **TDD.** Write a failing `testthat` test first, then the code that makes it pass.
 
@@ -68,10 +68,11 @@ To test client and server together without an Opal server, use [DSLite](https://
 
 Link to these docs, do not copy them into the repo.
 
-**Specs (this repo, not created yet)**
-- `spec/adr/`: architecture decision records
-- `spec/constraints/`: constraints every change must follow
-- `spec/iteration-plans/`: what is being built in each iteration
+**Specs (this repo)**
+- [spec/README.md](spec/README.md): what goes where and the naming scheme
+- [spec/adr/](spec/adr/): architecture decision records
+- [spec/constraints/](spec/constraints/): constraints every change must follow
+- [spec/iteration-plans/](spec/iteration-plans/): what is built in each iteration
 
 **Opal / DataSHIELD**
 - Opal docs: https://opaldoc.obiba.org/en/latest/
