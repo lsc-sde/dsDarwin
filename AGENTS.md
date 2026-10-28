@@ -48,6 +48,7 @@ Each `Client/` and `Server/` folder is a standalone R package. Build, check and 
 ## Rules
 
 1. **Spec first.** Read `spec/` before changing behaviour. Record any new decision as an ADR in `spec/adr/` (copy `template.md`) before you implement it.
+   With superpowers, save `brainstorming` designs and `writing-plans` plans to `spec/iteration-plans/` (naming in [spec/README.md](spec/README.md)), not `docs/superpowers/`.
 2. **Disclosure control.** Server functions must never return row-level data to the client. Every aggregate function checks its output against the DataSHIELD disclosure thresholds (`nfilter.*`) before returning it.
 3. **TDD.** Write a failing `testthat` test first, then the code that makes it pass.
 

@@ -10,7 +10,7 @@ The design documents for dsDarwin. The code must follow them.
 |---|---|---|
 | [adr/](adr/) | Architecture decision records: choices that could have gone another way, and why we chose as we did. Copy [adr/template.md](adr/template.md). | `adr/NNNN-short-slug.md` (next free four-digit number) |
 | [constraints/](constraints/) | Standing rules every change must follow. Changing one needs team agreement. | `constraints/short-slug.md` |
-| [iteration-plans/](iteration-plans/) | What each iteration delivers, written before the code. | `iteration-plans/iteration-N-short-slug.md` |
+| [iteration-plans/](iteration-plans/) | What each iteration delivers, written before the code. | `iteration-plans/iteration-N-short-slug-design.md` (superpowers `brainstorming`) and `iteration-plans/iteration-N-short-slug-plan.md` (superpowers `writing-plans`) |
 
 ## ADR status
 
