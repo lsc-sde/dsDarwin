@@ -10,4 +10,4 @@ Naming and registration rules for every wrapped DARWIN package. Rationale: [ADR-
   - **assign**: creates an object on the server (e.g. a cohort table) and returns nothing to the client.
   - **aggregate**: returns a summary that is safe to disclose (e.g. counts above the threshold).
 - Opal only allows server functions that are declared in the server package's `inst/DATASHIELD` file, under `AssignMethods:` or `AggregateMethods:`.
-  Disclosure settings (`default.nfilter.*`) go under `Options:` in the same file. See `inst/DATASHIELD` in [dsBase](https://github.com/datashield/dsBase) for the format.
+  See `inst/DATASHIELD` in [dsBase](https://github.com/datashield/dsBase) for the format. Disclosure thresholds: [disclosure-control.md](disclosure-control.md).

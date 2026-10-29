@@ -7,6 +7,9 @@ Entry point for every coding agent working in this repo (Claude Code, opencode, 
 dsDarwin wraps DARWIN EU OMOP R packages for DataSHIELD, so analysts can run them on data they cannot see.
 First target: **CohortConstructor**, for the [HERON-UK Characterisation](https://github.com/heron-uk/HERON-UK-Characterisation) study on **Delphi-100k**.
 
+Delphi-100k is a synthetic OMOP CDM 5.4 shipped by omock (`omock::mockCdmFromDataset("delphi-100k_5.4", source = "duckdb")`).
+It is the first dataset, not the target: the same packages must run on any OMOP CDM, so no Delphi-specific schemas, table names or concept IDs in package code.
+
 Every wrapped function becomes a pair:
 
 - **Server package**: installed in a Rock R-server image, run by Opal, next to the data. Returns only disclosure-checked results.
@@ -16,12 +19,13 @@ Every wrapped function becomes a pair:
 
 ```
 dsDarwin/
+├── .agents/skills/        # shared agent skills; .claude/skills symlinks here
 ├── CohortConstructor/
-│   ├── Client/            # client R package: ds.* functions
-│   └── Server/            # server R package: *DS assign/aggregate functions
+│   ├── Client/            # (not scaffolded yet) client R package: ds.* functions
+│   └── Server/            # (not scaffolded yet) server R package: *DS assign/aggregate functions
 ├── <NextDarwinPackage>/   # same Client/Server pair per wrapped DARWIN package
 ├── deploy/
-│   ├── Tiltfile           # local dev loop on k8s
+│   ├── Tiltfile           # (placeholder) local dev loop on k8s
 │   ├── Dockerfile         # (planned) Rock image with the server packages installed
 │   ├── yaml/              # (planned) Opal config values and profiles
 │   └── k8s/               # Kubernetes manifests
@@ -39,10 +43,14 @@ Package and function naming, assign vs aggregate, and `inst/DATASHIELD` registra
 
 ## Rules
 
-1. **Spec first.** Read `spec/` before changing behaviour. Record any new decision as an ADR in `spec/adr/` (copy `template.md`) before you implement it.
-   With superpowers, save `brainstorming` designs and `writing-plans` plans to `spec/iteration-plans/` (naming in [spec/README.md](spec/README.md)), not `docs/superpowers/`.
-2. **Disclosure control.** Server functions must never return row-level data to the client. Every aggregate function checks its output against the DataSHIELD disclosure thresholds (`nfilter.*`) before returning it.
-3. **TDD.** Write a failing `testthat` test first, then the code that makes it pass.
+1. **Spec first.** Read `spec/` before changing behaviour.
+   Write an ADR in `spec/adr/` (copy `template.md`) only for a decision that meets the [ADR threshold](spec/README.md#when-to-write-an-adr); most iterations need none or one. If unsure, don't write one: note the choice in the iteration plan or PR and let a human decide.
+   Agent-written ADRs stay `Proposed`, at most one per PR, and name the threshold they meet. Only a human sets `Accepted`.
+2. Read the existing constraints to follow the conventions that must be followed for this project [spec/constraints]
+3. Every agent: before coding, write `spec/iteration-plans/iteration-N-<slug>-plan.md` (naming in [spec/README.md](spec/README.md)) and list any ADR candidates in it.
+   With superpowers, save `brainstorming` designs and `writing-plans` plans there, not in `docs/superpowers/`.
+3. **TDD.** Write a failing `testthat` test first before writing the implementation code. For a bug or regression, first add a test that reproduces it, then fix it; the test stays so it can't come back.
+   Unit tests use the omock `GiBleed` CDM (6 MB); Delphi-100k (1.5 GB) is for end-to-end runs.
 
 ## Build, check, test
 
@@ -55,7 +63,6 @@ Rscript -e 'devtools::check("CohortConstructor/Server")'      # R CMD check
 Rscript -e 'devtools::install("CohortConstructor/Server")'
 ```
 
-To test client and server together without an Opal server, use [DSLite](https://datashield.github.io/DSLite/), an in-memory DataSHIELD server.
 
 ## Reference docs
 
@@ -80,4 +87,6 @@ Link to these docs, do not copy them into the repo.
 - CohortConstructor: https://ohdsi.github.io/CohortConstructor/
 - omopgenerics: https://darwin-eu.github.io/omopgenerics/
 - CDMConnector: https://darwin-eu.github.io/CDMConnector/
+- omock (mock and synthetic CDMs, incl. Delphi-100k): https://ohdsi.github.io/omock/
+- Also used by HERON: [OmopSketch](https://ohdsi.github.io/OmopSketch/), [CohortCharacteristics](https://darwin-eu.github.io/CohortCharacteristics/), [PatientProfiles](https://darwin-eu.github.io/PatientProfiles/), [OmopConstructor](https://ohdsi.github.io/OmopConstructor/)
 - HERON-UK Characterisation study: https://github.com/heron-uk/HERON-UK-Characterisation
