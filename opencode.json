@@ -24,6 +24,14 @@
         "mcptools::mcp_server(tools = btw::btw_tools(c(\"docs\", \"pkg\", \"env\", \"sessioninfo\", \"cran\")))"
       ],
       "enabled": true
+    },
+    "github": {
+      "type": "remote",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer {env:GITHUB_TOKEN}"
+      },
+      "enabled": true
     }
   }
 }

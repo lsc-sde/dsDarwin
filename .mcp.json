@@ -20,6 +20,11 @@
         "-e",
         "mcptools::mcp_server(tools = btw::btw_tools(c(\"docs\", \"pkg\", \"env\", \"sessioninfo\", \"cran\")))"
       ]
+    },
+    "github": {
+      "type": "http",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headersHelper": "printf '{\"Authorization\":\"Bearer %s\"}' \"$(gh auth token)\""
     }
   }
 }
