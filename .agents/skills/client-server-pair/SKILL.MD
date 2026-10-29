@@ -113,5 +113,3 @@ result is disclosive, treat it as disclosive and ask.
   disclosive case is blocked (see the `dslite-tests` skill).
 - Both functions are documented (see the `roxygen-docs` skill); the client
   docs name the server function it calls.
-- For a function that doesn't exist yet in any DataSHIELD package, write a
-  design note first (see the `design-note` skill).
