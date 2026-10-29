@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "datashield": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": ["--from", "git+https://github.com/obiba/datashield-mcp", "datashield-mcp"]
+    },
+    "context7": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp"
+    }
+  }
+}
