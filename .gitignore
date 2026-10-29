@@ -48,3 +48,6 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# DataSHIELD MCP server credentials
+.datashield/
