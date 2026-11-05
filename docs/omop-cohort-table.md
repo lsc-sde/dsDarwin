@@ -5,16 +5,17 @@ Full spec: the omopgenerics [cohorts article](https://darwin-eu.github.io/omopge
 
 ## The table
 
-One row per person per cohort entry:
+A cohort is a set of people, each with a time window. One row per person per cohort entry:
 
 | Column | Meaning |
 |---|---|
 | `cohort_definition_id` | Which cohort (integer, a key into `settings()`) |
-| `subject_id` | `person_id` from the CDM |
+| `subject_id` | `person_id` from the CDM: links the entry to the person's rows in every OMOP table |
 | `cohort_start_date` | Date of entry |
 | `cohort_end_date` | Date of exit |
 
-With `.softValidation = FALSE` (the default), omopgenerics checks for: no missing values, `start <= end`, no overlapping entries for the same subject in the same cohort, and entries that fall inside an observation period. HERON skips these checks with `.softValidation = TRUE` when it renames the cohort.
+CohortConstructor reads the OMOP tables of a `cdm` and adds cohort tables to it; it never changes the OMOP tables.
+The `cdm` comes from [omock](https://ohdsi.github.io/omock/) (synthetic, for tests) or [`CDMConnector::cdmFromCon()`](https://darwin-eu.github.io/CDMConnector/reference/cdmFromCon.html) (a database); both return the same `cdm_reference`.
 
 ## Attributes
 
@@ -27,75 +28,47 @@ A `cohort_table` carries these attributes, each read with an omopgenerics getter
 | [`cohortCount()`](https://darwin-eu.github.io/omopgenerics/reference/cohortCount.html) | Final `number_records` and `number_subjects` per cohort (the last attrition row) |
 | [`cohortCodelist()`](https://darwin-eu.github.io/omopgenerics/reference/cohortCodelist.html) | Concept IDs used to build each cohort (empty for demographic cohorts) |
 
-## Worked example: HERON's population cohort
+## HERON's population cohort
 
-HERON builds its general population cohort in `databaseCharacteristicsLocal()` ([`CharacterisationCode/scripts/functions.R`](https://github.com/heron-uk/HERON-UK-Characterisation/blob/main/CharacterisationCode/scripts/functions.R)):
+HERON uses two CohortConstructor functions, both in `databaseCharacteristicsLocal()` ([`CharacterisationCode/scripts/functions.R`](https://github.com/heron-uk/HERON-UK-Characterisation/blob/main/CharacterisationCode/scripts/functions.R)):
 
 ```r
 cdm$population <- CohortConstructor::demographicsCohort(cdm, "population", sex = sexCohort)
 cdm$population <- cdm$population |>
   omopgenerics::newCohortTable(cohortSetRef = set, .softValidation = TRUE) |>  # renames cohort to "general_population"
   CohortConstructor::trimToDateRange(dateRange = as.Date(c("2012-01-01", NA)))
-result$populationCharacteristics <- CohortCharacteristics::summariseCharacteristics(cdm$population, ...)
 ```
 
-The `omopgenerics::bind()` branch above it only runs when `ageGroup` is set, which HERON leaves as `NULL`.
+Its `omopgenerics::bind()` branch only runs when `ageGroup` is set; HERON leaves it `NULL`.
 
-The same steps on GiBleed (CohortConstructor 0.6.3, omopgenerics 1.4.0):
-
-```r
-cdm <- omock::mockCdmFromDataset("GiBleed", source = "duckdb")
-cdm$population <- CohortConstructor::demographicsCohort(cdm, "population", sex = "Both")
-cdm$population <- CohortConstructor::trimToDateRange(cdm$population, dateRange = as.Date(c("2012-01-01", NA)))
-```
-
-```
-> head(cdm$population, 3)                      # row-level: never leaves the server
-  cohort_definition_id subject_id cohort_start_date cohort_end_date
-1                    1        123 2012-01-01        2013-07-17
-2                    1        129 2012-01-01        2018-07-02
-3                    1         16 2012-01-01        2017-11-02
-
-> settings(cdm$population)
-  cohort_definition_id cohort_name  sex
-1                    1 demographics Both
-
-> cohortCount(cdm$population)
-  cohort_definition_id number_records number_subjects
-1                    1           2540            2540
-
-> attrition(cdm$population)
-  number_records number_subjects reason_id reason                                  excluded_records excluded_subjects
-1           2694            2694         1 Initial qualifying events                              0                 0
-2           2694            2694         2 Non-missing sex                                        0                 0
-3           2694            2694         3 Sex requirement: Both                                  0                 0
-4           2540            2540         4 cohort_start_date trimmed >= 2012-01-01              154               154
-```
-
-- [`demographicsCohort(cdm, name, ageRange, sex, minPriorObservation)`](https://ohdsi.github.io/CohortConstructor/reference/demographicsCohort.html): one entry per person per observation period that meets the criteria. The default `cohort_name` is `demographics`; HERON renames it with `newCohortTable(cohortSetRef = )`.
-- [`trimToDateRange(cohort, dateRange, ...)`](https://ohdsi.github.io/CohortConstructor/reference/trimToDateRange.html): moves start and end dates into the range, drops entries left outside it, and adds an attrition row.
+Working example: [`examples/cohort-walkthrough.R`](../examples/cohort-walkthrough.R) (`Rscript examples/cohort-walkthrough.R`) runs these steps on GiBleed and follows one person through them.
+It shows where each function takes the entry's dates from ([`demographicsCohort()`](https://ohdsi.github.io/CohortConstructor/reference/demographicsCohort.html): `observation_period`; [`conceptCohort()`](https://ohdsi.github.io/CohortConstructor/reference/conceptCohort.html): the clinical record), how [`trimToDateRange()`](https://ohdsi.github.io/CohortConstructor/reference/trimToDateRange.html) cuts windows and drops people with no time left, and the summaries that can come back.
 
 ## What stays on the server, what can come back
 
-| Object or call | Row-level? | dsDarwin |
+Rule: anything with a `subject_id` or a person's own dates is row-level and stays on the server (**assign**).
+Anything with one row per cohort or per step is a summary and can come back (**aggregate**), after suppressing small counts.
+Pairs follow the [client-server-pair skill](../.agents/skills/client-server-pair/SKILL.md) and [ADR-0002](../spec/adr/0002-package-and-function-naming.md).
+
+| Call | Row-level? | dsDarwin pair |
 |---|---|---|
-| Cohort table rows | Yes | Stays on the server and is never returned |
-| `demographicsCohort()` | Creates rows | **assign**: `ds.demographicsCohort()` → `demographicsCohortDS()` |
-| `trimToDateRange()` | Changes rows | **assign**: `ds.trimToDateRange()` → `trimToDateRangeDS()` |
-| `newCohortTable(cohortSetRef = )`, `bind()` | Changes rows | assign if needed; HERON uses it only to rename the cohort (open question below) |
-| `settings()` | No, it's metadata | **aggregate**, safe to return as is |
-| `cohortCodelist()` | No, it's concept IDs | **aggregate**, safe to return as is |
-| `cohortCount()` | Counts | **aggregate**, suppress small counts |
-| `attrition()` | Counts | **aggregate**, suppress small counts, `excluded_*` too: a small difference between two steps singles out people |
-| `CohortCharacteristics::summariseCharacteristics()` | Summary | **aggregate** in a later package; `min`/`max` of dates and ages are one person's values, so they are disclosive |
+| Cohort table rows | Yes | Stay on the server and are never returned |
+| `demographicsCohort()` | Creates rows | **assign**: `ds.demographicsCohort()` → `demographicsCohortDS()`. Required (HERON) |
+| `trimToDateRange()` | Changes rows | **assign**: `ds.trimToDateRange()` → `trimToDateRangeDS()`. Required (HERON) |
+| `renameCohort()` | Changes the cohort name | **assign**: `ds.renameCohort()` → `renameCohortDS()`. Optional: replaces HERON's `newCohortTable(cohortSetRef = )` rename with the same result |
+| `attrition()` | Counts from the data | **aggregate**: `ds.attrition()` → `attritionDS()`. Recommended: HERON doesn't call it, but it is the analyst's only check on a cohort they can't see. Small counts suppressed in `excluded_records` and `excluded_subjects` too: a small difference between two steps singles out people |
+| `cohortCount()` | Counts from the data | No pair: it is the last row of `attrition()` ([source](https://github.com/darwin-eu/omopgenerics/blob/main/R/cohortCount.R)), so the client takes it from `ds.attrition()` |
+| `settings()`, `cohortCodelist()` | No, the analyst's own arguments and concept IDs | **aggregate** if needed, returned as is |
+| `conceptCohort()` | Creates rows | **assign**: `ds.conceptCohort()` → `conceptCohortDS()`. Later, not used by HERON |
+| [`measurementCohort()`](https://ohdsi.github.io/CohortConstructor/reference/measurementCohort.html) | Creates rows | Not wrapped yet: not used by HERON. Its `valueAsNumber` range lets the analyst probe one person's value by comparing counts across narrow ranges, so it needs its own plan. GiBleed measurements have no values, so tests need Delphi-100k or `omock::mockMeasurement()` |
+| `bind()` | Changes rows | No pair: only HERON's `ageGroup` branch uses it |
 
-Names follow [ADR-0002](../spec/adr/0002-package-and-function-naming.md); output rules follow [disclosure-control.md](../spec/constraints/disclosure-control.md).
+Only functions the analyst calls get a pair; CohortConstructor's internals run unchanged inside the server function.
+Other omopgenerics functions HERON calls either work on results already returned (`bind()` of results, `exportSummarisedResult()`: client side, no pair) or are server housekeeping (logging, `dropSourceTable()`: no pair).
 
-HERON suppresses only at export ([`exportSummarisedResult(minCellCount = )`](https://darwin-eu.github.io/omopgenerics/reference/exportSummarisedResult.html)).
-In dsDarwin, suppression must happen in the server function, before anything is returned.
-Which threshold to use (`nfilter.tab` or `minCellCount`) is still open: #16.
+Each server function must also guard what reaches the analyst outside its return value ([disclosure-control.md](../spec/constraints/disclosure-control.md)):
 
-## Open questions
-
-- Should `ds.demographicsCohort()` take the cohort name directly, so no rename wrapper (`newCohortTable(cohortSetRef = )`) is needed?
-- Suppression threshold: #16.
+- **Errors.** omopgenerics validation errors list up to five `subject_id`s (`checkOverlap()` in [`classCohortTable.R`](https://github.com/darwin-eu/omopgenerics/blob/main/R/classCohortTable.R)), and DataSHIELD returns server errors to the client. Catch errors from wrapped packages and raise a generic message. 
+  - In the `checkOverlap()` as the part of the `omopgenerics` package. It calls internally when we call the `newCohortTable()` when creating cohorts and changing rows. Need to create the output helper wrap so ds functions be handle output case
+- **Small subsets.** An assign step that drops people (`trimToDateRange()`, later `require*()`) refuses results below `nfilter.subset`, as dsBase subset functions do.
+- **Suppression in the server.** HERON suppresses only at export ([`exportSummarisedResult(minCellCount = )`](https://darwin-eu.github.io/omopgenerics/reference/exportSummarisedResult.html)); dsDarwin suppresses before returning.
