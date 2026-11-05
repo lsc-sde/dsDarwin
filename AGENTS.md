@@ -71,6 +71,7 @@ Rscript -e 'devtools::install("CohortConstructor/Server")'
 
 Link to these docs, do not copy them into the repo.
 MCP servers, skills and plugins for agents: [docs/agent-setup.md](docs/agent-setup.md).
+Cohort table, its attributes, and what stays on the server vs what can come back: [docs/omop-cohort-table.md](docs/omop-cohort-table.md).
 
 **Specs (this repo)**
 - [spec/README.md](spec/README.md): what goes where and the naming scheme
