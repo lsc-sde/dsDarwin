@@ -1,0 +1,37 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "datashield": {
+      "type": "local",
+      "command": [
+        "uvx",
+        "--from",
+        "git+https://github.com/obiba/datashield-mcp",
+        "datashield-mcp"
+      ],
+      "enabled": true
+    },
+    "context7": {
+      "type": "remote",
+      "url": "https://mcp.context7.com/mcp",
+      "enabled": true
+    },
+    "r-mcptools": {
+      "type": "local",
+      "command": [
+        "Rscript",
+        "-e",
+        "mcptools::mcp_server(tools = btw::btw_tools(c(\"docs\", \"pkg\", \"env\", \"sessioninfo\", \"cran\")))"
+      ],
+      "enabled": true
+    },
+    "github": {
+      "type": "remote",
+      "url": "https://api.githubcopilot.com/mcp/",
+      "headers": {
+        "Authorization": "Bearer {env:GITHUB_TOKEN}"
+      },
+      "enabled": true
+    }
+  }
+}

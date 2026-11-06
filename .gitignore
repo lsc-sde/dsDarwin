@@ -40,11 +40,12 @@ vignettes/*.pdf
 .Renviron
 .env
 
-# pkgdown site
-docs/
 
 # translation temp files
 po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# DataSHIELD MCP server credentials
+.datashield/
