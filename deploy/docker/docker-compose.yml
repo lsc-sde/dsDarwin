@@ -1,8 +1,4 @@
-# Local Opal stack, the obiba "standalone" install (no database server):
-#   https://opaldoc.obiba.org/en/dev/admin/installation.html
-# Opal keeps its own config (users, DataSHIELD profiles, resources) in H2 under /srv.
-# Dev-only password: the obiba docs default. Never reuse it anywhere real.
-name: dsdarwin 
+name: dsdarwin
 services:
   opal:
     image: obiba/opal:6.1.3
@@ -13,13 +9,29 @@ services:
       - ROCK_HOSTS=rock:8085
     volumes:
       - opal-home:/srv
+
+  # One-off: downloads and builds Delphi-100k into omop-data, or skips if it is
+  # there, then exits. Same image as rock, so the duckdb versions match.
+  delphi-setup:
+    image: dsdarwin/rock:dev
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    entrypoint: ["Rscript", "/scripts/load-delphi.R"]
+    volumes:
+      - omop-data:/data
+      - ../scripts/load-delphi.R:/scripts/load-delphi.R:ro
+
   rock:
-    # datashield/rock-base instead of the docs' obiba/rock: it ships dsBase.
-    image: datashield/rock-base:6.3.5-R4.6.1
+    image: dsdarwin/rock:dev
+    depends_on:
+      delphi-setup:
+        condition: service_completed_successfully
     volumes:
       - rock-home:/srv # R packages installed via opalr survive restarts
+      - omop-data:/data:ro # the CDM: read-only for every R session
 
-# Default network (dsdarwin_default) only: obiba's fixed `name: opal` clashes with a docker-opal checkout.
 volumes:
   opal-home:
   rock-home:
+  omop-data: 
