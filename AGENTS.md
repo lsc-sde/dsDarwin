@@ -34,11 +34,12 @@ dsDarwin/
 ├── <NextDarwinPackage>/   # same Client/Server pair per wrapped DARWIN package
 ├── deploy/
 │   ├── Tiltfile           # local dev loop: wraps docker/docker-compose.yml
-│   ├── docker/            # local Opal + Rock stack (obiba standalone docker compose)
-│   ├── Dockerfile         # (planned) Rock image with the server packages installed
+│   ├── docker/            # local stack: Opal + Rock + one-off delphi-setup loader (Delphi-100k DuckDB on the omop-data volume)
+│   ├── scripts/           # load-delphi.R (run by delphi-setup), smoke-test.R (DataSHIELD reaches Rock, Rock reads the CDM)
+│   ├── Dockerfile         # Rock image: rock-base + duckdb + CDMConnector; (planned) the server packages
 │   ├── yaml/              # (planned) Opal config values and profiles
 │   └── k8s/               # (planned) Kubernetes manifests
-├── examples/              # runnable scripts: smoke-test.R (DataSHIELD call reaches Rock); (planned) HERON on Delphi-100k
+├── examples/              # runnable analyses: cohort-walkthrough.R; (planned) HERON on Delphi-100k
 ├── docs/                  # agent-setup.md; (planned) wrapping guide, CONTRIBUTING.md
 ├── spec/                  # ADRs, constraints, iteration plans
 └── .github/workflows/     # (planned) CI: R CMD check, Rock image build and push
