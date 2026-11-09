@@ -30,7 +30,7 @@ The data never passes through Opal: Opal only knows where it is (the resource) a
 ## Goals
 
 - `cd deploy && tilt up` starts `opal` and `rock` from `deploy/docker/docker-compose.yml`.
-- A DataSHIELD call reaches Rock: `Rscript examples/smoke-test.R` lists the dsBase aggregate methods.
+- A DataSHIELD call reaches Rock: `Rscript deploy/scripts/smoke-test.R` lists the dsBase aggregate methods.
 - Opal settings and Rock's installed R packages survive `tilt down` / `tilt up` (named volumes).
 
 ## Non-goals
@@ -57,13 +57,13 @@ The data never passes through Opal: Opal only knows where it is (the resource) a
 
 - `deploy/docker/docker-compose.yml`: the stack.
 - `deploy/Tiltfile`: `docker_compose(...)` + a link to Opal.
-- `examples/smoke-test.R`: the end-to-end check (retries login: Opal needs ~30s on a first boot).
+- `deploy/scripts/smoke-test.R`: the end-to-end check (on a first boot Opal accepts logins ~30 s after it answers HTTP; rerun if it fails right after `tilt up`).
 - `AGENTS.md`: repo layout updated.
 
 ## Done when
 
 1. `cd deploy && tilt up` → `opal` and `rock` green in the Tilt UI (Opal takes 1–2 min).
-2. `Rscript examples/smoke-test.R` exits 0 and prints dsBase aggregate methods.
+2. `Rscript deploy/scripts/smoke-test.R` exits 0 and prints dsBase aggregate methods.
 3. `tilt down && tilt up`, smoke test again → still passes; `docker volume ls` still shows both volumes.
 
 ## Next: iteration 2 — bring Delphi-100k

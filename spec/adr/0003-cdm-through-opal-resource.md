@@ -23,7 +23,13 @@ The CDM lives in its own database, outside Opal's storage, and is registered in 
 The analyst assigns it with `datashield.assign.resource()` and only ever sees the resource name.
 A server function turns the resource connection into a `cdm` with `CDMConnector::cdmFromCon()`; the CDM schema and the write schema/prefix come from the resource definition set by the Opal admin, not from analyst arguments.
 
-The storage engine (Postgres vs DuckDB file) is not decided here; it is iteration 2.
+For the local HERON test the CDM is a DuckDB file (team decision; [iteration 2](../iteration-plans/iteration-2-delphi-data-plan.md)).
+A DuckDB file accepts one writer or many readers, so every session attaches the CDM `READ_ONLY` into its own in-memory DuckDB and writes cohorts there.
+Server databases (Postgres, SQL Server) use the resource's connection directly and a results schema for cohorts.
+
+Which resolver provides the resource type is still open:
+[dsOMOP](https://github.com/isglobal-brge/dsOMOP)'s `omop.dbi.db` (Opal form, many engines, but its DuckDB connection opens read-write)
+or a small resolver of our own.
 
 ## Consequences
 
@@ -31,5 +37,6 @@ The storage engine (Postgres vs DuckDB file) is not decided here; it is iteratio
 - The analyst cannot name a schema or table, so cannot aim a `*DS` function at raw tables.
 - Same mechanism for Delphi-100k locally and a real site's CDM: only the resource definition changes.
 - Opal's tables-import route (and its data databases) is not used for OMOP.
-- If the CDM is a DuckDB file, resourcer has no built-in resolver for it: we'd need a small custom `ResourceResolver`. Postgres works with resourcer's DBI resolvers out of the box.
-- Rock needs `resourcer` plus the DBI driver for the chosen engine installed in its image.
+- resourcer has no built-in DuckDB resolver: either dsOMOP (bypassing its read-write connection) or our own `ResourceResolver`.
+- Rock needs `resourcer` plus the DBI driver for the engine installed in its image.
+- With DuckDB, cohort tables live in session memory and vanish at logout, like any DataSHIELD session object.
