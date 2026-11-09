@@ -1,4 +1,11 @@
 # Local Opal stack: obiba standalone docker compose (opal, rock). Opal UI/API: http://localhost:8880
-#   cd deploy && tilt up      then: Rscript examples/smoke-test.R
+#   cd deploy && tilt up      then, from the repo root: Rscript deploy/scripts/smoke-test.R
 docker_compose('docker/docker-compose.yml', project_name='dsdarwin') 
 dc_resource('opal', links=['http://localhost:8880'])
+
+# Tilt treats a compose service as ready once its container starts and ignores
+# depends_on, so wait for the one-off loader to exit 0 before starting Rock.
+local_resource('delphi-setup-done',
+               cmd='test "$(docker wait dsdarwin-delphi-setup-1)" = 0',
+               resource_deps=['delphi-setup'])
+dc_resource('rock', resource_deps=['delphi-setup-done'])
