@@ -11,10 +11,9 @@ builder$append(
   password = "password",
   driver = "OpalDriver"
 )
-# First boot: Opal answers HTTP ~20s before it accepts logins. Retry for 2 min.
-Sys.sleep(5)
-conns <- tryCatch(DSI::datashield.login(builder$build()),error = function(e) e)
 
+conns <- DSI::datashield.login(builder$build())
+Sys.sleep(5)
 methods <- DSI::datashield.methods(conns, type = "aggregate")
 
 DSI::datashield.logout(conns)
