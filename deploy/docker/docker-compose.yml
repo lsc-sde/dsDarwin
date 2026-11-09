@@ -1,0 +1,25 @@
+# Local Opal stack, the obiba "standalone" install (no database server):
+#   https://opaldoc.obiba.org/en/dev/admin/installation.html
+# Opal keeps its own config (users, DataSHIELD profiles, resources) in H2 under /srv.
+# Dev-only password: the obiba docs default. Never reuse it anywhere real.
+name: dsdarwin 
+services:
+  opal:
+    image: obiba/opal:6.1.3
+    ports:
+      - "8880:8080"
+    environment:
+      - OPAL_ADMINISTRATOR_PASSWORD=password
+      - ROCK_HOSTS=rock:8085
+    volumes:
+      - opal-home:/srv
+  rock:
+    # datashield/rock-base instead of the docs' obiba/rock: it ships dsBase.
+    image: datashield/rock-base:6.3.5-R4.6.1
+    volumes:
+      - rock-home:/srv # R packages installed via opalr survive restarts
+
+# Default network (dsdarwin_default) only: obiba's fixed `name: opal` clashes with a docker-opal checkout.
+volumes:
+  opal-home:
+  rock-home:
