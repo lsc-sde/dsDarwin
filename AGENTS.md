@@ -33,11 +33,12 @@ dsDarwin/
 │   └── Server/            # (not scaffolded yet) server R package: *DS assign/aggregate functions
 ├── <NextDarwinPackage>/   # same Client/Server pair per wrapped DARWIN package
 ├── deploy/
-│   ├── Tiltfile           # (placeholder) local dev loop on k8s
+│   ├── Tiltfile           # local dev loop: wraps docker/docker-compose.yml
+│   ├── docker/            # local Opal + Rock stack (obiba standalone docker compose)
 │   ├── Dockerfile         # (planned) Rock image with the server packages installed
 │   ├── yaml/              # (planned) Opal config values and profiles
-│   └── k8s/               # Kubernetes manifests
-├── examples/              # (planned) runnable analyses, e.g. HERON on Delphi-100k
+│   └── k8s/               # (planned) Kubernetes manifests
+├── examples/              # runnable scripts: smoke-test.R (DataSHIELD call reaches Rock); (planned) HERON on Delphi-100k
 ├── docs/                  # agent-setup.md; (planned) wrapping guide, CONTRIBUTING.md
 ├── spec/                  # ADRs, constraints, iteration plans
 └── .github/workflows/     # (planned) CI: R CMD check, Rock image build and push
