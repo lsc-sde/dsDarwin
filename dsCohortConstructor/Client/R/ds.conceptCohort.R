@@ -7,7 +7,7 @@
 #' cohort as `cdm$<name>`. Nothing comes back to the analyst.
 #'
 #' Opal only accepts simple argument values, so for now `conceptSet` holds one
-#' codelist with one concept id.
+#' codelist with one concept id. For now
 #'
 #' @param cdm Name of the cdm object on the servers (made by `cdmFromConDS()`).
 #' @param conceptSet A named list with one concept id, e.g.
