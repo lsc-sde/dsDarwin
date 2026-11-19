@@ -36,10 +36,6 @@ findConnections <- function(datasources = NULL) {
   if (is.null(datasources)) {
     datasources <- DSI::datashield.connections_find()
   }
-  if (!is.list(datasources) || !length(datasources) ||
-      !all(vapply(datasources, methods::is, logical(1), "DSConnection"))) {
-    stop("`datasources` must be a list of DSConnection objects.", call. = FALSE)
-  }
   datasources
 }
 
