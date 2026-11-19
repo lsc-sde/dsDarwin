@@ -28,19 +28,21 @@ Every wrapped function becomes a pair:
 ```
 dsDarwin/
 ├── .agents/skills/        # shared agent skills; .claude/skills symlinks here
-├── CohortConstructor/
-│   ├── Client/            # (not scaffolded yet) client R package: ds.* functions
-│   └── Server/            # (not scaffolded yet) server R package: *DS assign/aggregate functions
-├── <NextDarwinPackage>/   # same Client/Server pair per wrapped DARWIN package
+├── dsCohortConstructor/   # wraps CohortConstructor; folder = server package name
+│   ├── Client/            # client R package dsCohortConstructorClient: ds.* functions
+│   └── Server/            # server R package dsCohortConstructor: *DS assign/aggregate functions, baked into the Rock image
+├── ds<DarwinPackage>/     # same Client/Server pair per wrapped DARWIN package
+├── helpers/
+│   └── dsDarwinHelpers/   # shared by every pair: Server (disclosure control, argument checks), Client (call building, assign/aggregate wrappers)
 ├── deploy/
 │   ├── Tiltfile           # local dev loop: wraps docker/docker-compose.yml
 │   ├── docker/            # local stack: Opal + Rock + one-off delphi-setup loader (Delphi-100k DuckDB on the omop-data volume)
 │   ├── scripts/           # load-delphi.R (run by delphi-setup), smoke-test.R (DataSHIELD reaches Rock, Rock reads the CDM)
-│   ├── Dockerfile         # Rock image: rock-base + duckdb + CDMConnector; (planned) the server packages
+│   ├── Dockerfile         # Rock image: rock-base + duckdb + CDMConnector + CohortConstructor + the server packages (build context: repo root)
 │   ├── yaml/              # (planned) Opal config values and profiles
 │   └── k8s/               # (planned) Kubernetes manifests
-├── examples/              # runnable analyses: cohort-walkthrough.R; (planned) HERON on Delphi-100k
-├── docs/                  # agent-setup.md; (planned) wrapping guide, CONTRIBUTING.md
+├── examples/              # runnable analyses: cohort-walkthrough.R, cdm-test.R, concept-cohort.R (end to end on Delphi); (planned) HERON on Delphi-100k
+├── docs/                  # agent-setup.md, heron-analysis.md (HERON targets vs fedn, #12); (planned) wrapping guide, CONTRIBUTING.md
 ├── spec/                  # ADRs, constraints, iteration plans
 └── .github/workflows/     # (planned) CI: R CMD check, Rock image build and push
 ```
@@ -60,13 +62,13 @@ Each `Client/` and `Server/` folder is a standalone R package. Build, check and 
 
 ## Build, check, test
 
-Run these from the repo root, once per package (`CohortConstructor/Server`, `CohortConstructor/Client`):
+Run these from the repo root, once per package (`helpers/dsDarwinHelpers/Server`, `helpers/dsDarwinHelpers/Client`, `dsCohortConstructor/Server`, `dsCohortConstructor/Client`; install the helpers first):
 
 ```sh
-Rscript -e 'devtools::document("CohortConstructor/Server")'   # roxygen -> NAMESPACE, man/
-Rscript -e 'devtools::test("CohortConstructor/Server")'       # testthat
-Rscript -e 'devtools::check("CohortConstructor/Server")'      # R CMD check
-Rscript -e 'devtools::install("CohortConstructor/Server")'
+Rscript -e 'devtools::document("dsCohortConstructor/Server")'   # roxygen -> NAMESPACE, man/
+Rscript -e 'devtools::test("dsCohortConstructor/Server")'       # testthat
+Rscript -e 'devtools::check("dsCohortConstructor/Server")'      # R CMD check
+Rscript -e 'devtools::install("dsCohortConstructor/Server")'
 ```
 
 ## Reference docs
