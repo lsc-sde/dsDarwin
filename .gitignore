@@ -49,3 +49,6 @@ rsconnect/
 
 # DataSHIELD MCP server credentials
 .datashield/
+
+# roxygen output: regenerate with devtools::document()
+man/
