@@ -15,8 +15,8 @@ services:
   delphi-setup:
     image: dsdarwin/rock:dev
     build:
-      context: ..
-      dockerfile: Dockerfile
+      context: ../.. # repo root: the image installs the server packages
+      dockerfile: deploy/Dockerfile
     entrypoint: ["Rscript", "/scripts/load-delphi.R"]
     volumes:
       - omop-data:/data
