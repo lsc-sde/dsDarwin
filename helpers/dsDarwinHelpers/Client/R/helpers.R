@@ -13,11 +13,12 @@ AsSymbol <- function(x) {
 #' Build a DataSHIELD call from a server function name and arguments
 #'
 #' @param fnName The server function name, e.g. `"conceptCohortDS"`.
-#' @param ... Arguments: [AsSymbol()] values are sent as object names, the rest as values.
+#' @param ... Arguments: [AsSymbol()] values are sent as object names, `NULL`s
+#'   are dropped (the server default applies), the rest are sent as values.
 #' @return An R call, e.g. `conceptCohortDS(cdm = cdm, name = "gibleed")`.
 #' @export
 buildDSCall <- function(fnName, ...) {
-  arguments <- lapply(list(...), function(value) {
+  arguments <- lapply(Filter(Negate(is.null), list(...)), function(value) {
     if (inherits(value, "AsSymbol")) {
       return(str2lang(unclass(value)))
     }
