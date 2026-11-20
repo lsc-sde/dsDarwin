@@ -1,6 +1,6 @@
 Package: dsDarwinHelpers
 Title: Shared DataSHIELD Server Helpers for dsDarwin Packages
-Version: 0.0.0.0001
+Version: 0.0.1
 Authors@R: person("dsDarwin", "contributors", role = c("aut", "cre"), email = "karectl@lthtr.nhs.uk")
 Description: Server-side helpers shared by the dsDarwin server packages that
     wrap DARWIN EU functions: disclosure control with the server's DataSHIELD
