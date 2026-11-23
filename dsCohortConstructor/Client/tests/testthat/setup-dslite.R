@@ -6,6 +6,9 @@ dslite.server$assignMethod(
   "cdmFromConDS",
   function() suppressMessages(omock::mockCdmFromDataset("GiBleed", source = "duckdb"))
 )
+# c and list come from dsBase in Opal's `default` profile.
+dslite.server$assignMethod("c", "base::c")
+dslite.server$assignMethod("list", "base::list")
 assign("dslite.server", dslite.server, envir = globalenv())
 
 builder <- DSI::newDSLoginBuilder()
