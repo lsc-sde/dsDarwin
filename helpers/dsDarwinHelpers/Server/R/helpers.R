@@ -8,12 +8,46 @@
 #' @return The threshold, a single number.
 #' @export
 nfilterTab <- function() {
-  #Getting threshold from the settings of opal
-  threshold <- getOption("nfilter.tab", getOption("default.nfilter.tab"))
-  if (is.null(threshold)) {
-    stop("No disclosure threshold set (nfilter.tab).", call. = FALSE)
+  option <- getOption("nfilter.tab", getOption("default.nfilter.tab"))
+  if (is.null(option)) {
+    cli::cli_abort(c(
+      "No disclosure threshold set.",
+      i = "Set {.code nfilter.tab} in the Opal DataSHIELD profile."
+    ))
+  }
+  threshold <- suppressWarnings(as.numeric(option))
+  if (length(threshold) != 1 || is.na(threshold) || threshold < 1) {
+    cli::cli_abort(c(
+      "Malformed disclosure threshold {.code nfilter.tab}.",
+      x = "Got {.val {option}}; need a single number of at least 1."
+    ))
   }
   threshold
+}
+
+#' Check where a cohort may be written
+#'
+#' `cdm` must be a `cdm_reference`, and `name` may be new or an existing
+#' cohort, never another CDM table (e.g. `person`).
+#'
+#' @param cdm The session's `cdm_reference`.
+#' @param name Name of the cohort table to write in `cdm`.
+#' @return `NULL`, invisibly; stops otherwise.
+#' @export
+checkCohortTarget <- function(cdm, name) {
+  if (!inherits(cdm, "cdm_reference")) {
+    cli::cli_abort(c(
+      "{.arg cdm} must be a {.cls cdm_reference}.",
+      x = "You supplied {.cls {class(cdm)}}."
+    ))
+  }
+  if (name %in% names(cdm) && !inherits(cdm[[name]], "cohort_table")) {
+    cli::cli_abort(c(
+      "{.arg name} {.val {name}} is a CDM table, not a cohort.",
+      i = "Use a new name or an existing cohort."
+    ))
+  }
+  invisible(NULL)
 }
 
 #' Apply disclosure control to a table of counts
