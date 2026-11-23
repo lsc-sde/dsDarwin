@@ -1,0 +1,8 @@
+# Rock image build context is the repo root (deploy/docker/docker-compose.yml).
+# Send only what deploy/Dockerfile copies; everything else stays out.
+*
+!deploy/Dockerfile
+!helpers/dsDarwinHelpers/Server
+!dsCohortConstructor/Server
+helpers/dsDarwinHelpers/Server/tests
+dsCohortConstructor/Server/tests
