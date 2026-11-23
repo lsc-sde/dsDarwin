@@ -6,6 +6,8 @@ Description: Server-side helpers shared by the dsDarwin server packages that
     wrap DARWIN EU functions: disclosure control with the server's DataSHIELD
     thresholds and argument checks. Declares no DataSHIELD methods itself.
 License: Apache License (>= 2)
+Imports:
+    cli
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Suggests:
