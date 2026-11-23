@@ -1,9 +1,20 @@
-# dsDarwin Rock image: DataSHIELD Rock + what the DARWIN packages need.
-# Used twice in deploy/docker/docker-compose.yml: as the Rock R server and as
-# the one-off delphi-setup loader, so the duckdb that writes the CDM file is the
+# dsDarwin Rock image: DataSHIELD Rock + what the DARWIN packages need + the
+# dsDarwin server packages. Used twice in deploy/docker/docker-compose.yml: as
+# the Rock R server and as the one-off delphi-setup loader, so the duckdb that
+# writes the CDM file is the one Rock reads it with.
 # Rock's R repo is a dated Posit snapshot (p3m.dev/.../2026-10-28): prebuilt
 # binaries, same versions on every build. HERON's renv.lock pinning is #17.
+# Build context: the repo root (see .dockerignore).
 FROM datashield/rock-base:6.3.5-R4.6.1
 
-RUN Rscript -e 'install.packages(c("duckdb", "CDMConnector"))' \
+RUN Rscript -e 'install.packages(c("duckdb", "CDMConnector", "CohortConstructor"))' \
  && Rscript -e 'stopifnot(requireNamespace("duckdb"), requireNamespace("CDMConnector"))'
+
+# Server packages live in the image: Rock's R library is not on a volume and
+# Opal refuses local installs (iteration 3). The script finds every ds*/Server
+# and helpers/*/Server package (.dockerignore sends only those), so a new one
+# needs no edit here. Opal still has to publish their methods once:
+# opalr::dsadmin.publish_package() (examples/concept-cohort.R).
+COPY . /tmp/dsdarwin
+RUN Rscript /tmp/dsdarwin/deploy/scripts/install-server-packages.R /tmp/dsdarwin \
+ && rm -rf /tmp/dsdarwin
