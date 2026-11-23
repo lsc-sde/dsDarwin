@@ -3,6 +3,7 @@
 # dependencies before the packages that import them. Fails unless all load.
 # Usage: Rscript deploy/scripts/install-server-packages.R [repo root]
 
+# Find local server packages and key their paths by package name.
 find_server_packages <- function(root) {
   descriptions <- Sys.glob(file.path(
     root,
@@ -20,10 +21,12 @@ find_server_packages <- function(root) {
   paths
 }
 
+# Read the declared name from a package's DESCRIPTION file.
 read_package_name <- function(description) {
   read.dcf(description, "Package")[[1]]
 }
 
+# Extract package names from DESCRIPTION for dependency checks.
 read_dependencies <- function(path) {
   fields <- read.dcf(
     file.path(path, "DESCRIPTION"),
@@ -34,6 +37,7 @@ read_dependencies <- function(path) {
   setdiff(dependencies, c("R", ""))
 }
 
+# Install a local package using the same R as this script.
 install_package <- function(name, path) {
   r_bin <- file.path(R.home("bin"), "R")
   status <- system2(r_bin, c("CMD", "INSTALL", shQuote(path)))
@@ -46,6 +50,7 @@ install_package <- function(name, path) {
   }
 }
 
+# Install local prerequisites first and fail on dependency cycles.
 install_in_dependency_order <- function(paths, dependencies) {
   todo <- names(paths)
   while (length(todo) > 0) {
@@ -67,6 +72,7 @@ install_in_dependency_order <- function(paths, dependencies) {
   }
 }
 
+# Install missing dependencies and verify that each server package loads.
 main <- function(args = commandArgs(trailingOnly = TRUE)) {
   root <- if (length(args) > 0) args[[1]] else "."
   paths <- find_server_packages(root)
