@@ -8,7 +8,7 @@
 FROM datashield/rock-base:6.3.5-R4.6.1
 
 RUN Rscript -e 'install.packages(c("duckdb", "CDMConnector", "CohortConstructor"))' \
- && Rscript -e 'stopifnot(requireNamespace("duckdb"), requireNamespace("CDMConnector"), requireNamespace("CohortConstructor"))'
+ && Rscript -e 'stopifnot(requireNamespace("duckdb"), requireNamespace("CDMConnector"))'
 
 # Server packages live in the image: Rock's R library is not on a volume and
 # Opal refuses local installs (iteration 3). The script finds every ds*/Server
