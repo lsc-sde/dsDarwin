@@ -46,5 +46,6 @@ test_that("conceptCohortDS: a concept with no records gives an empty cohort, no 
 test_that("inst/DATASHIELD declares conceptCohortDS as an assign method only", {
   dcf <- read.dcf(system.file("DATASHIELD", package = "dsCohortConstructor"))
   expect_match(dcf[, "AssignMethods"], "conceptCohortDS")
+  expect_match(dcf[, "AssignMethods"], "demographicsCohortDS")
   expect_false(any(c("AggregateMethods", "Options") %in% colnames(dcf)))
 })

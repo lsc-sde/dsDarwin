@@ -32,3 +32,14 @@ test_that("nfilterTab accepts a threshold set as a string, as Opal options are",
   withr::local_options(nfilter.tab = "5")
   expect_equal(nfilterTab(), 5)
 })
+
+test_that("checkCohortTarget accepts a new or cohort name, refuses a non-cdm or a CDM table", {
+  cdm <- structure(
+    list(person = data.frame(), old = structure(data.frame(), class = c("cohort_table", "data.frame"))),
+    class = "cdm_reference"
+  )
+  expect_silent(checkCohortTarget(cdm, "new"))
+  expect_silent(checkCohortTarget(cdm, "old"))
+  expect_error(checkCohortTarget(cdm, "person"), "CDM table")
+  expect_error(checkCohortTarget(unclass(cdm), "new"), "cdm_reference")
+})

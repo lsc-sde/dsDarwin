@@ -16,3 +16,7 @@ test_that("a string with quotes and code stays one plain value", {
 test_that("findConnections refuses things that are not DSConnections", {
   expect_error(findConnections(list(1)), "DSConnection")
 })
+
+test_that("buildDSCall drops NULL arguments so server defaults apply", {
+  expect_identical(buildDSCall("f", a = 1, b = NULL), quote(f(a = 1)))
+})
