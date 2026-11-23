@@ -41,7 +41,7 @@ dsDarwin/
 │   ├── Dockerfile         # Rock image: rock-base + duckdb + CDMConnector + CohortConstructor + the server packages (build context: repo root)
 │   ├── yaml/              # (planned) Opal config values and profiles
 │   └── k8s/               # (planned) Kubernetes manifests
-├── examples/              # runnable analyses: cohort-walkthrough.R, cdm-test.R, concept-cohort.R (end to end on Delphi); (planned) HERON on Delphi-100k
+├── examples/              # runnable analyses: cohort-walkthrough.R, cdm-test.R, concept-cohort.R (end to end on Delphi); Heron-study/ (HERON CodeToRun through DataSHIELD, undeveloped calls marked)
 ├── docs/                  # agent-setup.md, heron-analysis.md (HERON targets vs fedn, #12); (planned) wrapping guide, CONTRIBUTING.md
 ├── spec/                  # ADRs, constraints, iteration plans
 └── .github/workflows/     # (planned) CI: R CMD check, Rock image build and push
