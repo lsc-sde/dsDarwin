@@ -1,12 +1,7 @@
 #' Create a demographics-based cohort on each server
 #'
-#' Client side of [CohortConstructor::demographicsCohort()]: each server builds
-#' the cohort from its own data and keeps it as `cdm$<name>`.
-#'
-#' @details Sends an **assign** request; the updated cdm is stored back under
-#'   `cdm`. `NULL` arguments are not sent, so CohortConstructor's defaults apply.
-#'   `ageRange` is sent as a list of doubles.
-#'   Server function called: \code{demographicsCohortDS}
+#' Calls `demographicsCohortDS()` to create `cdm$<name>` on each server.
+#' Optional `NULL` arguments use the server defaults.
 #'
 #' @param cdm Name of the cdm object on the servers (made by `cdmFromConDS()`).
 #' @param name Name of the new cohort table in the server cdm, snake_case.
@@ -15,7 +10,13 @@
 #' @param sex `NULL`, `"Both"`, `"Male"` or `"Female"`.
 #' @param minPriorObservation `NULL` or days of prior observation required.
 #' @param datasources DataSHIELD connections; `NULL` uses the default ones.
-#' @return `NULL`, invisibly. Nothing comes back from the servers.
+#' @return `NULL`, invisibly.
+#' @examples
+#' \dontrun{
+#' # conns holds active study connections with cdm already assigned.
+#' ds.demographicsCohort("cdm", "population", ageRange = c(18, 150),
+#'                       datasources = conns)
+#' }
 #' @export
 ds.demographicsCohort <- function(cdm = "cdm", name, ageRange = NULL, sex = NULL,
                                   minPriorObservation = NULL, datasources = NULL) {
