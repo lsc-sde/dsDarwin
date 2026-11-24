@@ -50,20 +50,36 @@ checkCohortTarget <- function(cdm, name) {
   invisible(NULL)
 }
 
-#' Apply disclosure control to a table of counts
+#' Apply disclosure control to an aggregate result
 #'
-#' Counts above 0 and below [nfilterTab()] become `NA`, per cell, so one small
-#' cohort does not hide the others.
-#'
-#' @param counts A data frame with `number_records` and `number_subjects`.
-#' @return `counts` with small counts replaced by `NA`.
+#' The threshold is always [nfilterTab()]. A `summarised_result` goes through
+#' [omopgenerics::suppress()], which also hides estimates linked to a
+#' suppressed count. In any other data frame, numeric columns whose name
+#' matches `count`, `n_records`, `n_subjects` or `number` have counts above 0
+#' and below the threshold set to `NA`, per cell, so one small cohort does not
+#' hide the others. Anything else stops.
+#' Need to be used for cohortCharacteristics 
+#' @param result A `summarised_result` or a data frame of counts.
+#' @return `result` with small counts suppressed.
 #' @export
-applyDisclosureControl <- function(counts) {
+applyDisclosureControl <- function(result) {
   threshold <- nfilterTab()
-  for (col in c("number_records", "number_subjects")) {
-    x <- counts[[col]]
-    x[x > 0 & x < threshold] <- NA
-    counts[[col]] <- x
+  if (inherits(result, "summarised_result")) {
+    return(omopgenerics::suppress(result, minCellCount = threshold))
   }
-  counts
+  if (!is.data.frame(result)) {
+    cli::cli_abort(c(
+      "Disclosure control needs a {.cls summarised_result} or a data frame.",
+      x = "Got {.cls {class(result)}}."
+    ))
+  }
+  countCols <- grep("count|n_records|n_subjects|number", names(result), value = TRUE, ignore.case = TRUE)
+  for (col in countCols) {
+    x <- result[[col]]
+    if (is.numeric(x)) {
+      x[x > 0 & x < threshold] <- NA
+      result[[col]] <- x
+    }
+  }
+  result
 }
