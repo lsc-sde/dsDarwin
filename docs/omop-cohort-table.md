@@ -41,8 +41,9 @@ cdm$population <- cdm$population |>
 
 Its `omopgenerics::bind()` branch only runs when `ageGroup` is set; HERON leaves it `NULL`.
 
-Working example: [`examples/cohort-walkthrough.R`](../examples/cohort-walkthrough.R) (`Rscript examples/cohort-walkthrough.R`) runs these steps on GiBleed and follows one person through them.
-It shows where each function takes the entry's dates from ([`demographicsCohort()`](https://ohdsi.github.io/CohortConstructor/reference/demographicsCohort.html): `observation_period`; [`conceptCohort()`](https://ohdsi.github.io/CohortConstructor/reference/conceptCohort.html): the clinical record), how [`trimToDateRange()`](https://ohdsi.github.io/CohortConstructor/reference/trimToDateRange.html) cuts windows and drops people with no time left, and the summaries that can come back.
+Working example: [`examples/cohort-walkthrough.R`](../examples/cohort-walkthrough.R) (`Rscript examples/cohort-walkthrough.R`, local stack up) runs these steps through DataSHIELD on Delphi-100k with the wrapped `ds.*` functions.
+It builds cohorts with `ds.demographicsCohort()`, `ds.renameCohort()` and `ds.conceptCohort()`, shows that only each cohort's class comes back, and that reading a CDM table or a cohort's rows is refused.
+`trimToDateRange()` and the summaries join it when their pairs exist.
 
 ## What stays on the server, what can come back
 
