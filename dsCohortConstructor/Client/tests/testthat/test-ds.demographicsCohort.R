@@ -4,11 +4,16 @@ nativeDemographicsCount <- function(...) {
   omopgenerics::cohortCount(cohort)
 }
 
-test_that("ds.demographicsCohort builds the cohort on the server, counts match native", {
-  expect_null(ds.demographicsCohort("cdm", "population", datasources = conns))
-  cohort <- serverCdm()$population
-  expect_s3_class(cohort, "cohort_table")
-  expect_identical(omopgenerics::cohortCount(cohort), nativeDemographicsCount())
+test_that("ds.demographicsCohort runs HERON's population call, counts match native", {
+  for (sex in c(TRUE, FALSE)) {
+    sexCohort <- if (sex) "Both"
+    expect_null(ds.demographicsCohort(
+      cdm = "cdm", name = "population", sex = sexCohort, datasources = conns
+    ))
+    cohort <- serverCdm()$population
+    expect_s3_class(cohort, "cohort_table")
+    expect_identical(omopgenerics::cohortCount(cohort), nativeDemographicsCount(sex = sexCohort))
+  }
 })
 
 test_that("ds.demographicsCohort sends ageRange, sex and minPriorObservation", {
