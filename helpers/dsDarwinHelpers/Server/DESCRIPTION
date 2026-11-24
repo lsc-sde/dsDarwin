@@ -7,7 +7,8 @@ Description: Server-side helpers shared by the dsDarwin server packages that
     thresholds and argument checks. Declares no DataSHIELD methods itself.
 License: Apache License (>= 2)
 Imports:
-    cli
+    cli,
+    omopgenerics
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 Suggests:
