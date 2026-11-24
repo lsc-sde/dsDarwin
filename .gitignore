@@ -52,3 +52,5 @@ rsconnect/
 
 # roxygen output: regenerate with devtools::document()
 man/
+
+*.Rproj
