@@ -14,7 +14,9 @@ cdmFromConDS <- function() {
 }
 
 # Admin - opalr
-o <- opalr::opal.login("administrator", "password", url = url)
+o <- opalr::opal.login(
+  Sys.getenv("OPAL_ADMIN_USER"), Sys.getenv("OPAL_ADMIN_PASSWORD"), url = url
+)
 opalr::dsadmin.set_method(o, "cdmFromConDS", func = cdmFromConDS, type = "assign")
 opalr::dsadmin.set_option(o, "dsDarwin.cdm.path", "/data/delphi-100k.duckdb")
 
@@ -32,10 +34,15 @@ for (attempt in 1:5) {
 }
 stopifnot(published)
 
-if (!opalr::oadmin.user_exists(o, "analyst")) {
-  opalr::oadmin.user_add(o, "analyst", password = "Password1@")
+if (!opalr::oadmin.user_exists(o, Sys.getenv("OPAL_ANALYST_USER"))) {
+  opalr::oadmin.user_add(
+    o, Sys.getenv("OPAL_ANALYST_USER"),
+    password = Sys.getenv("OPAL_ANALYST_PASSWORD")
+  )
 }
-opalr::dsadmin.perm_add(o, "analyst", type = "user", permission = "use")
+opalr::dsadmin.perm_add(
+  o, Sys.getenv("OPAL_ANALYST_USER"), type = "user", permission = "use"
+)
 opalr::dsadmin.profile_enable(o, "default")
 opalr::opal.logout(o)
 
@@ -43,8 +50,8 @@ opalr::opal.logout(o)
 # Analyst perspective
 builder <- DSI::newDSLoginBuilder()
 builder$append(
-  server = "local", url = url, user = "analyst",
-  password = "Password1@", driver = "OpalDriver"
+  server = "local", url = url, user = Sys.getenv("OPAL_ANALYST_USER"),
+  password = Sys.getenv("OPAL_ANALYST_PASSWORD"), driver = "OpalDriver"
 )
 conns <- DSI::datashield.login(builder$build())
 

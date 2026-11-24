@@ -32,8 +32,8 @@ builder <- DSI::newDSLoginBuilder()
 builder$append(
   server = "local",
   url = url,
-  user = "analyst",
-  password = "Password1@",
+  user = Sys.getenv("OPAL_ANALYST_USER"),
+  password = Sys.getenv("OPAL_ANALYST_PASSWORD"),
   driver = "OpalDriver"
 )
 conns <- DSI::datashield.login(builder$build())

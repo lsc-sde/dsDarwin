@@ -7,8 +7,8 @@ builder <- DSI::newDSLoginBuilder()
 builder$append(
   server = "local",
   url = Sys.getenv("OPAL_URL", "http://localhost:8880"),
-  user = "administrator",
-  password = "password",
+  user = Sys.getenv("OPAL_ADMIN_USER"),
+  password = Sys.getenv("OPAL_ADMIN_PASSWORD"),
   driver = "OpalDriver"
 )
 
