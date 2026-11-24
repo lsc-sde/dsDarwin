@@ -142,15 +142,13 @@ databaseCharacteristics <- function(cdm,
     datasources = datasources
   )
 
-  # NOT DEVELOPED [step 3] ds.renameCohort -> renameCohortDS
-  #   (dsCohortConstructor, assign). Replaces HERON's settings() +
-  #   newCohortTable(cohortSetRef = set). Scalars only, not blocked.
-  # ds.renameCohort(
-  #   cdm = cdm,
-  #   cohort = "population",
-  #   newCohortName = "general_population",
-  #   datasources = datasources
-  # )
+  # [step 3] replaces HERON's settings() + newCohortTable(cohortSetRef = set).
+  ds.renameCohort(
+    cdm = cdm,
+    cohort = "population",
+    newCohortName = "general_population",
+    datasources = datasources
+  )
 
   # NOT DEVELOPED [step 4] ds.trimToDateRange -> trimToDateRangeDS
   #   (dsCohortConstructor, assign). Blocked on: Date vector through Opal.
