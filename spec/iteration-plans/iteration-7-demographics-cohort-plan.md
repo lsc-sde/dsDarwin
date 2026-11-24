@@ -71,3 +71,9 @@ Flatten the optional argument guards and shorten the server documentation.
 Keep validation before the upstream call, which creates the cohort table
 before applying demographic filters. The existing server tests cover the
 valid and invalid inputs. No additional ADR candidate.
+
+## Client documentation
+
+Use the concept cohort wrapper as the model for the demographics cohort help
+page. Describe the server assignment and add a multi-study example. No ADR
+candidate.
