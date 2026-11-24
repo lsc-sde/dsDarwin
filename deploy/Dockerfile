@@ -1,24 +1,24 @@
-# Build from the repository root. See .dockerignore for the files sent to Docker.
-# Compose uses this image for Rock and the one-off Delphi loader so both use
-# the same DuckDB version to read and write the CDM file.
+# Use the repository root as the build context. .dockerignore limits which
+# files Docker receives.
+# Rock and the Delphi loader share this image so they use the same DuckDB
+# version to read and write the Delphi-100k database.
 FROM datashield/rock-base:6.3.5-R4.6.1
 
-# The base image tag pins R. The pins below reproduce the HERON results on
-# Delphi-100k obtained with the study's renv.lock (iteration 9, #17).
-# pak requires the specified versions. It resolves unpinned
-# CRAN dependencies against Rock's dated Posit snapshot (2026-10-28).
-# The list covers every DARWIN package HERON uses, wrapped or not yet. Wrapping
-# one not listed here? Pin it too: install-server-packages.R installs missing
-# imports at the snapshot's version.
+# The Rock base image sets the R version. Pin the packages used by HERON to
+# the versions tested on Delphi-100k with the study's renv.lock (issue #17).
+# The list includes packages that dsDarwin has yet to wrap. When adding a
+# wrapper for another HERON package, add its tested version here.
+# Unpinned CRAN dependencies come from Rock's 2026-10-28 Posit snapshot.
 RUN Rscript -e 'pak::pak(c( \
       "CohortConstructor@0.6.3", "CDMConnector@2.8.0", "omopgenerics@1.4.2", \
       "PatientProfiles@1.6.1", "CohortCharacteristics@1.1.3", \
       "OmopConstructor@0.3.0", "OmopSketch@1.1.1", "duckdb@2.0.0"))'
 
-# Bake server packages into Rock so deployments carry their own R library.
-# The installer discovers packages under ds*/Server and helpers/*/Server.
-# Publish their DataSHIELD methods in Opal after deployment. See
-# opalr::dsadmin.publish_package() in examples/concept-cohort.R.
+# Install the local R packages under ds*/Server and helpers/*/Server into
+# the image so Rock can load them at runtime. The installer handles package
+# dependencies and checks that each server package loads.
+# After deployment, publish the DataSHIELD methods in Opal with
+# opalr::dsadmin.publish_package(). See examples/concept-cohort.R.
 COPY . /tmp/dsdarwin
 RUN Rscript /tmp/dsdarwin/deploy/scripts/install-server-packages.R /tmp/dsdarwin \
  && rm -rf /tmp/dsdarwin
