@@ -1,5 +1,7 @@
 # R env file for OPAL
 # Use this example to put your credentials for invoking examples folders files
+# Use command R_ENVIRON_USER=~/Documents/dsDarwin/.Renviron Rscript examples/cohort-walkthrough.R
+# to run desired example 
 OPAL_URL=http://localhost:8880
 OPAL_ADMIN_USER=administrator
 OPAL_ADMIN_PASSWORD=password
