@@ -3,3 +3,4 @@
 export(ds.conceptCohort)
 export(ds.demographicsCohort)
 export(ds.renameCohort)
+export(ds.trimToDateRange)
