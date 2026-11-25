@@ -3,3 +3,4 @@
 export(conceptCohortDS)
 export(demographicsCohortDS)
 export(renameCohortDS)
+export(trimToDateRangeDS)

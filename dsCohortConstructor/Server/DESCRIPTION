@@ -11,11 +11,13 @@ Roxygen: list(markdown = TRUE)
 Depends:
     R (>= 4.1.0)
 Imports:
+    cli,
     CohortConstructor,
     dsDarwinHelpers,
     omopgenerics,
     stats
 Suggests:
+    dplyr,
     omock,
     testthat (>= 3.0.0),
     withr
