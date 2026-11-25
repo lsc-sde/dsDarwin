@@ -31,10 +31,10 @@ functions still to wrap are visible in the place they are called, in the order t
 | 1 | `ds.summariseOmopSnapshot` → `summariseOmopSnapshotDS` | dsOmopSketch (new) | aggregate | suppression rule (#16); first aggregate |
 | 2 | `ds.summarisePerson` → `summarisePersonDS` | dsOmopSketch | aggregate | #16 |
 | 3 | `ds.renameCohort` → `renameCohortDS` | dsCohortConstructor | assign | nothing: scalars only |
-| – | **gate: argument encoding through Opal** (Date vectors, character vectors, nested lists, `Inf`) | | | ADR candidate |
-| 4 | `ds.trimToDateRange` → `trimToDateRangeDS` | dsCohortConstructor | assign | Date vector |
+| – | **gate: argument encoding through Opal** (character vectors, nested lists, `Inf`; Date vectors go as ISO strings, iteration 11) | | | ADR candidate |
+| 4 | `ds.trimToDateRange` → `trimToDateRangeDS` | dsCohortConstructor | assign | done ([iteration 11](iteration-11-trim-to-date-range-plan.md)) |
 | 5 | `ds.summariseCharacteristics` → `summariseCharacteristicsDS` | dsCohortCharacteristics (new) | aggregate | `estimates` list; quantiles/density suppression |
-| 6 | `ds.summariseObservationPeriod` → `summariseObservationPeriodDS` | dsOmopSketch | aggregate | Date vector |
+| 6 | `ds.summariseObservationPeriod` → `summariseObservationPeriodDS` | dsOmopSketch | aggregate | #16 (dates as ISO strings) |
 | 7 | `ds.summariseClinicalRecords` → `summariseClinicalRecordsDS` | dsOmopSketch | aggregate | character vectors; drops empty tables server-side; `conceptSummary` small cells |
 | 8 | `ds.summariseTrend` → `summariseTrendDS` | dsOmopSketch | aggregate | character vectors; yearly small cells. **Tier 1 complete** |
 | 9 | `ds.buildObservationPeriod` → `buildObservationPeriodDS` | dsOmopConstructor (new) | assign | `Inf`; result goes to `cdm_op`, not `cdm` |
