@@ -1,7 +1,7 @@
 name: dsdarwin
 services:
   opal:
-    image: obiba/opal:6.1.3
+    image: obiba/opal:6.2.2
     ports:
       - "8880:8080"
     environment:
@@ -34,4 +34,4 @@ services:
 volumes:
   opal-home:
   rock-home:
-  omop-data: 
+  omop-data:
