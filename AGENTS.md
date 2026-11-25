@@ -38,7 +38,7 @@ dsDarwin/
 │   ├── Tiltfile           # local dev loop: wraps docker/docker-compose.yml
 │   ├── docker/            # local stack: Opal + Rock + one-off delphi-setup loader (Delphi-100k DuckDB on the omop-data volume)
 │   ├── scripts/           # load-delphi.R (run by delphi-setup), install-server-packages.R (Rock image, CI), smoke-test.R (DataSHIELD reaches Rock, Rock reads the CDM)
-│   ├── Dockerfile         # Rock image: rock-base + duckdb + CDMConnector + CohortConstructor + the server packages (build context: repo root)
+│   ├── Dockerfile         # Rock image: rock-base + pinned DARWIN packages (iteration 9) + the server packages (build context: repo root)
 │   ├── yaml/              # (planned) Opal config values and profiles
 │   └── k8s/               # (planned) Kubernetes manifests
 ├── examples/              # runnable analyses: cohort-walkthrough.R, cdm-test.R, concept-cohort.R (end to end on Delphi); Heron-study/ (HERON CodeToRun through DataSHIELD, undeveloped calls marked)
