@@ -1,0 +1,26 @@
+# Overlay: Opal's DataSHIELD traces (OTLP) into MLflow. UI: http://localhost:5050 (macOS AirPlay holds 5000)
+# docker compose -f docker-compose.yml -f docker-compose.mlflow.yml up
+services:
+  opal:
+    environment:
+      - OTEL_SERVICE_NAME=opal
+      - OTEL_EXPORTER_OTLP_TRACES_ENDPOINT=http://mlflow:5000/v1/traces
+      - OTEL_EXPORTER_OTLP_TRACES_HEADERS=x-mlflow-experiment-id=1 
+      - OTEL_EXPORTER_OTLP_TRACES_PROTOCOL=http/protobuf
+      - OTEL_LOGS_EXPORTER=none # MLflow takes traces only
+      - OTEL_METRICS_EXPORTER=none
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:v3.16.0
+    ports:
+      - "5050:5000"
+    command: >
+      mlflow server --host 0.0.0.0 --port 5000
+      --backend-store-uri sqlite:////mlflow/mlflow.db
+      --artifacts-destination /mlflow/artifacts
+      --allowed-hosts localhost:5050,127.0.0.1:5050,mlflow:5000
+    volumes:
+      - mlflow-data:/mlflow
+
+volumes:
+  mlflow-data:

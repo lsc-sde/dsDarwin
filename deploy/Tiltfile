@@ -1,7 +1,9 @@
-# Local Opal stack: obiba standalone docker compose (opal, rock). Opal UI/API: http://localhost:8880
-#   cd deploy && tilt up      then, from the repo root: Rscript deploy/scripts/smoke-test.R
-docker_compose('docker/docker-compose.yml', project_name='dsdarwin') 
+# Local Opal stack: obiba standalone docker compose (opal, rock) + MLflow overlay for DataSHIELD traces.
+# Opal UI/API: http://localhost:8880   MLflow UI: http://localhost:5050 (Experiments > Default > Traces)
+#   cd deploy && tilt up      then, from the repo root: Rscript examples/smoke-test.R
+docker_compose(['docker/docker-compose.yml', 'docker/docker-compose.mlflow.yml'], project_name='dsdarwin')
 dc_resource('opal', links=['http://localhost:8880'])
+dc_resource('mlflow', links=['http://localhost:5050'])
 
 # Tilt treats a compose service as ready once its container starts and ignores
 # depends_on, so wait for the one-off loader to exit 0 before starting Rock.

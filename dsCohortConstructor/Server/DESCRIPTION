@@ -1,0 +1,23 @@
+Package: dsCohortConstructor
+Title: DataSHIELD Server Functions for 'CohortConstructor'
+Version: 0.0.1
+Authors@R: person("dsDarwin", "contributors", role = c("aut", "cre"), email = "karectl@lthtr.nhs.uk")
+Description: Server-side DataSHIELD functions that wrap 'CohortConstructor' from
+    DARWIN EU. They run in the Rock R server next to an OMOP CDM and return only
+    disclosure-checked results.
+License: Apache License (>= 2)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Depends:
+    R (>= 4.1.0)
+Imports:
+    CohortConstructor,
+    dsDarwinHelpers,
+    omopgenerics,
+    stats
+Suggests:
+    omock,
+    testthat (>= 3.0.0),
+    withr
+Config/testthat/edition: 3
+Config/roxygen2/version: 8.1.1

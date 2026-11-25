@@ -1,70 +1,74 @@
-# What CohortConstructor does, one person at a time, on GiBleed.
+# CohortConstructor through DataSHIELD, from the analyst's side, on Delphi-100k.
+# Every ds.* call builds a cohort inside Rock; only its class comes back.
+# Run after `cd deploy && tilt up` and once `Rscript examples/concept-cohort.R`
+# (registers cdmFromConDS() and publishes dsCohortConstructor).
 # Run: Rscript examples/cohort-walkthrough.R
-suppressMessages({
-  library(dplyr)
-  library(CohortConstructor)
-  library(omopgenerics)
-})
 
+library(DSOpal)
+library(dsCohortConstructorClient)
 
-# Or use the CDM connector to connect to the database
-cdm <- omock::mockCdmFromDataset("GiBleed", source = "duckdb")
-who <- 3115L #  any person_id
+opal_url <- Sys.getenv("OPAL_URL", "http://localhost:8880")
 
-cat("\n== 1. Raw OMOP data for person", who, "(CohortConstructor never changes this) ==\n")
-cdm$person |>
-  filter(person_id == who) |>
-  select(person_id, gender_concept_id, year_of_birth) |>
-  collect() |>
-  print()
-  
-cdm$observation_period |>
-  filter(person_id == who) |>
-  select(person_id, observation_period_start_date, observation_period_end_date) |>
-  collect() |>
-  print()
-  
-cdm$condition_occurrence |>
-  filter(person_id == who, condition_concept_id == 192671L) |>
-  select(person_id, condition_concept_id, condition_start_date) |>
-  collect() |>
-  print()
+show_class <- function(conns, symbol) {
+  print(DSI::datashield.aggregate(conns, call("classDS", symbol)))
+}
 
-cdm$drug_exposure |> 
-  filter(person_id == who, drug_concept_id == 1118084L) |>
-  select(person_id, drug_exposure_start_date,drug_exposure_end_date) |>
-  collect() |>
-  print() # Table exposure of the drug
+show_refusal <- function(conns, expr) {
+  try(DSI::datashield.aggregate(conns, expr), silent = TRUE)
+  print(DSI::datashield.errors())
+}
 
-cat("\n== 2. demographicsCohort: who is in the data, and for how long ==\n")
-cdm$population <- demographicsCohort(cdm, "population", sex = "Both")
-cdm$population |>
-  filter(subject_id == who) |>
-  collect() |>
-  print()
+builder <- DSI::newDSLoginBuilder()
+builder$append(
+  server = "local",
+  url = opal_url,
+  user = Sys.getenv("OPAL_ANALYST_USER"),
+  password = Sys.getenv("OPAL_ANALYST_PASSWORD"),
+  driver = "OpalDriver"
+)
+conns <- DSI::datashield.login(builder$build())
+DSI::datashield.assign.expr(conns, "cdm", quote(cdmFromConDS()))
 
-cat("\n== 3. trimToDateRange: only time from 2012 onwards counts ==\n")
-cdm$population <- trimToDateRange(cdm$population, dateRange = as.Date(c("2012-01-01", NA)))
-cdm$population |>
-  filter(subject_id == who) |>
-  collect() |>
-  print() # 0 rows = dropped
+cat("\n== 1. Raw OMOP data: refused ==\n")
+show_refusal(conns, quote(cdm$person))
 
-cat("\n== 4. conceptCohort: people with a GI bleed, from the day of the bleed ==\n")
-cdm$gibleed <- conceptCohort(cdm, conceptSet = list(gi_bleed = 192671L), name = "gibleed")
-cdm$gibleed |>
-  filter(subject_id == who) |>
-  collect() |>
-  print()
+cat("\n== 2. demographicsCohort: everyone in observation ==\n")
+ds.demographicsCohort("cdm", "population", sex = "Both", datasources = conns)
+show_class(conns, "cdm$population")
 
-cat("\n== 4b. conceptCohort with a drug code: people taking celecoxib ==\n")
-cdm$celecoxib <- conceptCohort(cdm, conceptSet = list(celecoxib = 1118084L), name = "celecoxib")
-cdm$celecoxib |>
-  filter(subject_id == who) |>
-  collect() |>
-  print()
+cat("\n== 3. demographicsCohort: women by age, 1 year prior observation ==\n")
+ds.demographicsCohort(
+  cdm = "cdm",
+  name = "women_by_age",
+  ageRange = list(c(0, 17), c(18, 64), c(65, 150)),
+  sex = "Female",
+  minPriorObservation = 365,
+  datasources = conns
+)
+show_class(conns, "cdm$women_by_age")
 
-cat("\n== 5. What we can move to the server ==\n")
-print(settings(cdm$gibleed))
-print(cohortCount(cdm$gibleed))
-print(attrition(cdm$population) |> select(reason, number_subjects, excluded_subjects))
+cat("\n== 4. renameCohort: population -> general_population (HERON) ==\n")
+ds.renameCohort(
+  cdm = "cdm",
+  cohort = "population",
+  newCohortName = "general_population",
+  datasources = conns
+)
+show_class(conns, "cdm$population")
+
+cat("\n== 5. conceptCohort: chronic kidney disease, from the diagnosis ==\n")
+ds.conceptCohort(
+  cdm = "cdm",
+  conceptSet = list(ckd = 46271022),
+  name = "ckd",
+  datasources = conns
+)
+show_class(conns, "cdm$ckd")
+
+cat("\n== 6. The cohort's rows: refused ==\n")
+show_refusal(conns, quote(cdm$ckd))
+
+#trimToDateRange(), settings(), cohortCount() and attrition() are
+# not wrapped yet; add their steps here when their ds.* pairs land.
+
+DSI::datashield.logout(conns)

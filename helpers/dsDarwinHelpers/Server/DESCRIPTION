@@ -1,0 +1,18 @@
+Package: dsDarwinHelpers
+Title: Shared DataSHIELD Server Helpers for dsDarwin Packages
+Version: 0.0.1
+Authors@R: person("dsDarwin", "contributors", role = c("aut", "cre"), email = "karectl@lthtr.nhs.uk")
+Description: Server-side helpers shared by the dsDarwin server packages that
+    wrap DARWIN EU functions: disclosure control with the server's DataSHIELD
+    thresholds and argument checks. Declares no DataSHIELD methods itself.
+License: Apache License (>= 2)
+Imports:
+    cli,
+    omopgenerics
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Suggests:
+    testthat (>= 3.0.0),
+    withr
+Config/testthat/edition: 3
+Config/roxygen2/version: 8.1.1

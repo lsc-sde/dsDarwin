@@ -1,0 +1,23 @@
+Package: dsCohortConstructorClient
+Title: DataSHIELD Client Functions for 'CohortConstructor'
+Version: 0.0.0.0001
+Authors@R: person("dsDarwin", "contributors", role = c("aut", "cre"), email = "karectl@lthtr.nhs.uk")
+Description: Client-side DataSHIELD functions that wrap 'CohortConstructor' from
+    DARWIN EU. Each one sends a call to the matching server function in
+    'dsCohortConstructor' and returns only what the server lets out.
+License: Apache License (>= 2)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Imports:
+    dsDarwinHelpersClient
+Suggests:
+    CohortConstructor,
+    DSI,
+    DSLite,
+    dsCohortConstructor,
+    omock,
+    omopgenerics,
+    testthat (>= 3.0.0),
+    withr
+Config/testthat/edition: 3
+Config/roxygen2/version: 8.1.1

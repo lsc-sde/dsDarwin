@@ -1,0 +1,18 @@
+Package: dsDarwinHelpersClient
+Title: Shared DataSHIELD Client Helpers for dsDarwin Packages
+Version: 0.0.0.9000
+Authors@R: person("dsDarwin", "contributors", role = c("aut", "cre"), email = "noreply@example.org")
+Description: Client-side helpers shared by the dsDarwin client packages: build
+    a DataSHIELD call that Opal accepts and send it as an assign or aggregate
+    request to every connected server.
+License: Apache License (>= 2)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+Imports:
+    DSI,
+    methods,
+    stats
+Suggests:
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Config/roxygen2/version: 8.1.1
