@@ -12,6 +12,7 @@ Imports:
     dsDarwinHelpersClient
 Suggests:
     CohortConstructor,
+    dplyr,
     DSI,
     DSLite,
     dsCohortConstructor,
