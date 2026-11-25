@@ -60,7 +60,7 @@ summariseCustomObservationPeriod <- function(cdm,
   ))
   # NOT DEVELOPED [step 6] ds.summariseObservationPeriod ->
   #   summariseObservationPeriodDS (dsOmopSketch, aggregate).
-  #   Blocked on: suppression rule (#16), Date vector through Opal.
+  #   Blocked on: suppression rule (#16); dates go as ISO strings (step 4).
   # res1 <- bindServers(ds.summariseObservationPeriod(
   #   cdm = "cdm_op",
   #   byOrdinal = TRUE,
@@ -77,7 +77,7 @@ summariseCustomObservationPeriod <- function(cdm,
   ))
   # NOT DEVELOPED [step 8] ds.summariseTrend -> summariseTrendDS
   #   (dsOmopSketch, aggregate). Blocked on: suppression rule (#16),
-  #   character and Date vectors through Opal.
+  #   character vectors through Opal.
   # res2 <- bindServers(ds.summariseTrend(
   #   cdm = "cdm_op",
   #   ageGroup = NULL,
@@ -150,14 +150,13 @@ databaseCharacteristics <- function(cdm,
     datasources = datasources
   )
 
-  # NOT DEVELOPED [step 4] ds.trimToDateRange -> trimToDateRangeDS
-  #   (dsCohortConstructor, assign). Blocked on: Date vector through Opal.
-  # ds.trimToDateRange(
-  #   cdm = cdm,
-  #   cohort = "population",
-  #   dateRange = dateRange,
-  #   datasources = datasources
-  # )
+  # [step 4] Dates cross Opal as "YYYY-MM-DD" strings.
+  ds.trimToDateRange(
+    cdm = cdm,
+    cohort = "population",
+    dateRange = dateRange,
+    datasources = datasources
+  )
 
   # NOT DEVELOPED [step 5] ds.summariseCharacteristics ->
   #   summariseCharacteristicsDS (dsCohortCharacteristics, aggregate).
@@ -191,7 +190,7 @@ databaseCharacteristics <- function(cdm,
   ))
   # NOT DEVELOPED [step 7] ds.summariseClinicalRecords ->
   #   summariseClinicalRecordsDS (dsOmopSketch, aggregate). Server drops
-  #   empty tables. Blocked on: character and Date vectors through Opal;
+  #   empty tables. Blocked on: character vectors through Opal;
   #   conceptSummary small cells.
   # result$clinicalRecords <- bindServers(ds.summariseClinicalRecords(
   #   cdm = cdm,
