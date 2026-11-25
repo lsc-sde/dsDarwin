@@ -1,4 +1,5 @@
 AssignMethods:
   conceptCohortDS,
   demographicsCohortDS,
-  renameCohortDS
+  renameCohortDS,
+  trimToDateRangeDS
